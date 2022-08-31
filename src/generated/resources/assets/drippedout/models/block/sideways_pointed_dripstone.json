@@ -1,0 +1,6 @@
+{
+  "parent": "drippedout:block/sideways_pointed",
+  "textures": {
+    "cross": "minecraft:block/pointed_dripstone_up_tip"
+  }
+}

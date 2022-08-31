@@ -1,0 +1,22 @@
+modLoader="javafml"
+loaderVersion="[40,)"
+issueTrackerURL="https://github.com/Mrbysco/DrippedOut/issues"
+license="MIT"
+
+[[mods]]
+modId="drippedout"
+version="${file.jarVersion}"
+displayName="DrippedOut"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/drippedout"
+authors="Mrbysco, Darkosto"
+description='''
+What do you call it when a stalagmite and a stalactite finally bump into each other in the center of a cave?
+
+A stala-fight.
+'''
+[[dependencies.drippedout]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.18.2,1.19)"
+ordering="NONE"
+side="BOTH"
