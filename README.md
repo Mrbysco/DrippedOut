@@ -1,4 +1,4 @@
-[![build](https://github.com/Mrbysco/drippedout/actions/workflows/build.yml/badge.svg)](https://github.com/Mrbysco/drippedout/actions/workflows/build.yml) [![](http://cf.way2muchnoise.eu/versions/665260.svg)](https://www.curseforge.com/minecraft/mc-mods/drippedout)
+[![build](https://github.com/Mrbysco/drippedout/actions/workflows/build.yml/badge.svg)](https://github.com/Mrbysco/drippedout/actions/workflows/build.yml) [![](http://cf.way2muchnoise.eu/versions/666822.svg)](https://www.curseforge.com/minecraft/mc-mods/drippedout)
 
 # Dripped Out #
 
