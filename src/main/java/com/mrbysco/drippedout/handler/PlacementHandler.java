@@ -34,6 +34,9 @@ public class PlacementHandler {
 				SoundType soundtype = state.getSoundType(level, relativePos, player);
 				level.playSound(player, relativePos, state.getSoundType(level, relativePos, player).getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
 
+				if (!player.getAbilities().instabuild) {
+					stack.shrink(1);
+				}
 				placeEvent.setCancellationResult(InteractionResult.SUCCESS);
 				placeEvent.setCanceled(true);
 			}
