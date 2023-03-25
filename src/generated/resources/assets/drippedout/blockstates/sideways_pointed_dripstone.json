@@ -1,5 +1,9 @@
 {
   "variants": {
+    "facing=east": {
+      "model": "drippedout:block/sideways_pointed_dripstone",
+      "y": 90
+    },
     "facing=north": {
       "model": "drippedout:block/sideways_pointed_dripstone"
     },
@@ -10,10 +14,6 @@
     "facing=west": {
       "model": "drippedout:block/sideways_pointed_dripstone",
       "y": 270
-    },
-    "facing=east": {
-      "model": "drippedout:block/sideways_pointed_dripstone",
-      "y": 90
     }
   }
 }

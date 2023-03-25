@@ -23,10 +23,9 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
@@ -43,12 +42,12 @@ public class DrippedDatagen {
 		ExistingFileHelper helper = event.getExistingFileHelper();
 
 		if (event.includeServer()) {
-			generator.addProvider(new DripLoots(generator));
+			generator.addProvider(true, new DripLoots(generator));
 		}
 		if (event.includeClient()) {
-			generator.addProvider(new Language(generator));
-			generator.addProvider(new BlockModels(generator, helper));
-			generator.addProvider(new BlockStates(generator, helper));
+			generator.addProvider(true, new Language(generator));
+			generator.addProvider(true, new BlockModels(generator, helper));
+			generator.addProvider(true, new BlockStates(generator, helper));
 		}
 	}
 
@@ -101,12 +100,12 @@ public class DrippedDatagen {
 
 		@Override
 		protected void registerStatesAndModels() {
-			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get());
+			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE);
 		}
 
-		private void makeSidewaysDripstone(Block block) {
-			ModelFile clusterBlock = models().getExistingFile(modLoc("block/" + block.getRegistryName().getPath()));
-			getVariantBuilder(block)
+		private void makeSidewaysDripstone(RegistryObject<Block> block) {
+			ModelFile clusterBlock = models().getExistingFile(modLoc("block/" + block.getId().getPath()));
+			getVariantBuilder(block.get())
 					.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
 					.modelForState().modelFile(clusterBlock).addModel()
 					.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.EAST)
@@ -125,13 +124,12 @@ public class DrippedDatagen {
 
 		@Override
 		protected void registerModels() {
-			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get());
+			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE);
 		}
 
-		private void makeSidewaysDripstone(Block block) {
-			ResourceLocation location = ForgeRegistries.BLOCKS.getKey(block);
-			withExistingParent(location.getPath(), modLoc("block/sideways_pointed"))
-					.texture("cross", mcLoc("block/pointed_dripstone_up_tip"));
+		private void makeSidewaysDripstone(RegistryObject<Block> block) {
+			withExistingParent(block.getId().getPath(), modLoc("block/sideways_pointed"))
+					.texture("cross", mcLoc("block/pointed_dripstone_up_tip")).renderType("cutout");
 		}
 	}
 }

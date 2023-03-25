@@ -21,15 +21,17 @@ public class PlacementHandler {
 
 	@SubscribeEvent
 	public void onBlockPlacement(RightClickBlock placeEvent) {
-		final Level level = placeEvent.getWorld();
-		final Player player = placeEvent.getPlayer();
+		if (placeEvent.getFace() == null) return;
+
+		final Level level = placeEvent.getLevel();
+		final Player player = placeEvent.getEntity();
 		final BlockPos relativePos = placeEvent.getPos().relative(placeEvent.getFace());
 		ItemStack stack = placeEvent.getItemStack();
 		if (stack.is(Items.POINTED_DRIPSTONE) && Plane.HORIZONTAL.test(placeEvent.getFace())) {
 			final Block sidewaysBlock = DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get();
 			BlockState state = sidewaysBlock.getStateForPlacement(
 					new BlockPlaceContext(player, placeEvent.getHand(), new ItemStack(sidewaysBlock), placeEvent.getHitVec()));
-			if (state.canSurvive(level, relativePos) && level.setBlockAndUpdate(relativePos, state)) {
+			if (state != null && state.canSurvive(level, relativePos) && level.setBlockAndUpdate(relativePos, state)) {
 				level.gameEvent(player, GameEvent.BLOCK_PLACE, relativePos);
 				SoundType soundtype = state.getSoundType(level, relativePos, player);
 				level.playSound(player, relativePos, state.getSoundType(level, relativePos, player).getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
