@@ -2,7 +2,6 @@ package com.mrbysco.drippedout.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -62,7 +61,7 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 				double d0 = Math.abs(livingEntity.getX() - livingEntity.xOld);
 				double d1 = Math.abs(livingEntity.getZ() - livingEntity.zOld);
 				if (d0 >= (double) 0.003F || d1 >= (double) 0.003F) {
-					livingEntity.hurt(DamageSource.STALAGMITE, 1.0F);
+					livingEntity.hurt(livingEntity.damageSources().stalagmite(), 1.0F);
 				}
 			}
 		}
