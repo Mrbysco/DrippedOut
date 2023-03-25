@@ -5,13 +5,18 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -23,10 +28,10 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 	public static final DirectionProperty TIP_DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
@@ -95,6 +100,17 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 		BlockPos blockpos = pos.relative(direction.getOpposite());
 		BlockState blockstate = levelReader.getBlockState(blockpos);
 		return blockstate.isFaceSturdy(levelReader, blockpos, direction);
+	}
+
+	@Override
+	public BlockState updateShape(BlockState state, Direction direction, BlockState state1,
+								  LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {
+		return direction.getOpposite() == state.getValue(TIP_DIRECTION) && !state.canSurvive(levelAccessor, pos) ? Blocks.AIR.defaultBlockState() : state;
+	}
+
+	@Override
+	public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+		return new ItemStack(Items.POINTED_DRIPSTONE);
 	}
 
 	@SuppressWarnings("deprecation")
