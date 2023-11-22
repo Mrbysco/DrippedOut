@@ -1,6 +1,7 @@
 package com.mrbysco.drippedout.datagen;
 
 import com.mrbysco.drippedout.DrippedOut;
+import com.mrbysco.drippedout.block.SidewaysDripBlock;
 import com.mrbysco.drippedout.registry.DripRegistry;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
@@ -15,15 +16,15 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.registries.DeferredBlock;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class DrippedDatagen {
 
 			@Override
 			protected Iterable<Block> getKnownBlocks() {
-				return (Iterable<Block>) DripRegistry.BLOCKS.getEntries().stream().map(RegistryObject::get)::iterator;
+				return (Iterable<Block>) DripRegistry.BLOCKS.getEntries().stream().map((block) -> (Block) block.get())::iterator;
 			}
 		}
 
@@ -98,7 +99,7 @@ public class DrippedDatagen {
 			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE);
 		}
 
-		private void makeSidewaysDripstone(RegistryObject<Block> block) {
+		private void makeSidewaysDripstone(DeferredBlock<SidewaysDripBlock> block) {
 			ModelFile clusterBlock = models().getExistingFile(modLoc("block/" + block.getId().getPath()));
 			getVariantBuilder(block.get())
 					.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
@@ -122,7 +123,7 @@ public class DrippedDatagen {
 			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE);
 		}
 
-		private void makeSidewaysDripstone(RegistryObject<Block> block) {
+		private void makeSidewaysDripstone(DeferredBlock<SidewaysDripBlock> block) {
 			withExistingParent(block.getId().getPath(), modLoc("block/sideways_pointed"))
 					.texture("cross", mcLoc("block/pointed_dripstone_up_tip")).renderType("cutout");
 		}
