@@ -5,7 +5,6 @@ import com.mrbysco.drippedout.handler.PlacementHandler;
 import com.mrbysco.drippedout.registry.DripRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
@@ -14,8 +13,7 @@ public class DrippedOut {
 	public static final String MOD_ID = "drippedout";
 	public static final Logger LOGGER = LogUtils.getLogger();
 
-	public DrippedOut() {
-		IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+	public DrippedOut(IEventBus eventBus) {
 		DripRegistry.BLOCKS.register(eventBus);
 
 		NeoForge.EVENT_BUS.register(new PlacementHandler());

@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[1,)"
+loaderVersion="[2,)"
 issueTrackerURL="https://github.com/Mrbysco/DrippedOut/issues"
 license="MIT"
 
@@ -16,13 +16,13 @@ A stala-fight.
 '''
 [[dependencies.drippedout]]
 modId="minecraft"
-mandatory=true
-versionRange="[1.20.2,1.21)"
+type="REQUIRED"
+versionRange="[1.20.4,1.21)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.drippedout]]
 modId="neoforge"
-mandatory=true
+type="REQUIRED"
 versionRange="[20.2.59-beta,)"
 ordering="NONE"
 side="BOTH"

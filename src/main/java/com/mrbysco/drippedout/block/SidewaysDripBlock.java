@@ -103,13 +103,13 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	public BlockState updateShape(BlockState state, Direction direction, BlockState state1,
-								  LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
+								  LevelAccessor levelAccessor, BlockPos pos, BlockPos neighborPos) {
 		return direction.getOpposite() == state.getValue(TIP_DIRECTION) && !state.canSurvive(levelAccessor, pos) ? Blocks.AIR.defaultBlockState() : state;
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
 		return new ItemStack(Items.POINTED_DRIPSTONE);
 	}
 
