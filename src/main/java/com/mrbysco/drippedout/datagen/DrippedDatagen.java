@@ -4,11 +4,13 @@ import com.mrbysco.drippedout.DrippedOut;
 import com.mrbysco.drippedout.block.SidewaysDripBlock;
 import com.mrbysco.drippedout.registry.DripRegistry;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -17,7 +19,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -27,19 +29,20 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class DrippedDatagen {
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) {
 		DataGenerator generator = event.getGenerator();
 		PackOutput packOutput = generator.getPackOutput();
+		CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 		ExistingFileHelper helper = event.getExistingFileHelper();
 
 		if (event.includeServer()) {
-			generator.addProvider(true, new DripLoots(packOutput));
+			generator.addProvider(true, new DripLoots(packOutput, lookupProvider));
 		}
 		if (event.includeClient()) {
 			generator.addProvider(true, new Language(packOutput));
@@ -49,10 +52,10 @@ public class DrippedDatagen {
 	}
 
 	private static class DripLoots extends LootTableProvider {
-		public DripLoots(PackOutput packOutput) {
+		public DripLoots(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> completableFuture) {
 			super(packOutput, Set.of(), List.of(
 					new SubProviderEntry(MonsterBlockTables::new, LootContextParamSets.BLOCK)
-			));
+			), completableFuture);
 		}
 
 		public static class MonsterBlockTables extends BlockLootSubProvider {
@@ -73,8 +76,8 @@ public class DrippedDatagen {
 		}
 
 		@Override
-		protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationContext) {
-			map.forEach((name, table) -> table.validate(validationContext));
+		protected void validate(WritableRegistry<LootTable> writableregistry, ValidationContext validationcontext, ProblemReporter.Collector problemreporter$collector) {
+			writableregistry.forEach((lootTable) -> lootTable.validate(validationcontext));
 		}
 	}
 
