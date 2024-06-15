@@ -60,8 +60,8 @@ public class DrippedDatagen {
 
 		public static class MonsterBlockTables extends BlockLootSubProvider {
 
-			protected MonsterBlockTables() {
-				super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+			protected MonsterBlockTables(HolderLookup.Provider lookupProvider) {
+				super(Set.of(), FeatureFlags.REGISTRY.allFlags(), lookupProvider);
 			}
 
 			@Override
