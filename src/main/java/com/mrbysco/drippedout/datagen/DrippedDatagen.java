@@ -6,8 +6,6 @@ import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.client.data.models.blockstates.Variant;
-import net.minecraft.client.data.models.blockstates.VariantProperties;
 import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
@@ -105,10 +103,10 @@ public class DrippedDatagen {
 			ResourceLocation resourcelocation = POINTED_DRIPSTONE.extend().renderType("cutout").build()
 					.create(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(), texturemapping, blockModels.modelOutput);
 			blockModels.blockStateOutput
-					.accept(MultiVariantGenerator.multiVariant(
+					.accept(MultiVariantGenerator.dispatch(
 									DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(),
-									Variant.variant().with(VariantProperties.MODEL, resourcelocation))
-							.with(BlockModelGenerators.createHorizontalFacingDispatch())
+									BlockModelGenerators.plainVariant(resourcelocation))
+							.with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING)
 					);
 		}
 	}

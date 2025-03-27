@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -57,7 +58,7 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+	protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier blockEffectApplier) {
 		if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
 			if ((livingEntity.xOld != livingEntity.getX() || livingEntity.zOld != livingEntity.getZ())) {
 				double d0 = Math.abs(livingEntity.getX() - livingEntity.xOld);
@@ -67,15 +68,12 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 				}
 			}
 		}
-		super.entityInside(state, level, pos, entity);
+		super.entityInside(state, level, pos, entity, blockEffectApplier);
 	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		switch (state.getValue(TIP_DIRECTION)) {
-			default -> {
-				return NORTH_SHAPE;
-			}
 			case EAST -> {
 				return EAST_SHAPE;
 			}
@@ -84,6 +82,9 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 			}
 			case WEST -> {
 				return WEST_SHAPE;
+			}
+			default -> {
+				return NORTH_SHAPE;
 			}
 		}
 	}
