@@ -2,6 +2,8 @@ package com.mrbysco.drippedout.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -12,8 +14,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
@@ -23,18 +25,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 
 public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
-	public static final DirectionProperty TIP_DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
+	public static final EnumProperty<Direction> TIP_DIRECTION = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	private static final VoxelShape NORTH_SHAPE = Block.box(3.0D, 3.0D, 4.0D, 13.0D, 13.0D, 16.0D);
@@ -49,7 +50,8 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 
 	public void onProjectileHit(Level level, BlockState state, BlockHitResult hitResult, Projectile projectile) {
 		BlockPos blockpos = hitResult.getBlockPos();
-		if (!level.isClientSide && projectile.mayInteract(level, blockpos) && projectile instanceof ThrownTrident && projectile.getDeltaMovement().length() > 0.6D) {
+		if (level instanceof ServerLevel serverlevel && projectile.mayInteract(serverlevel, blockpos) &&
+				projectile instanceof ThrownTrident && projectile.getDeltaMovement().length() > 0.6D) {
 			level.destroyBlock(blockpos, true);
 		}
 	}
@@ -103,13 +105,13 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-								  LevelAccessor levelAccessor, BlockPos pos, BlockPos neighborPos) {
-		return direction.getOpposite() == state.getValue(TIP_DIRECTION) && !state.canSurvive(levelAccessor, pos) ? Blocks.AIR.defaultBlockState() : state;
+	protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess,
+	                                 BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+		return direction.getOpposite() == state.getValue(TIP_DIRECTION) && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : state;
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
 		return new ItemStack(Items.POINTED_DRIPSTONE);
 	}
 

@@ -1,32 +1,35 @@
 package com.mrbysco.drippedout.datagen;
 
 import com.mrbysco.drippedout.DrippedOut;
-import com.mrbysco.drippedout.block.SidewaysDripBlock;
 import com.mrbysco.drippedout.registry.DripRegistry;
-import net.minecraft.core.Direction;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.blockstates.Variant;
+import net.minecraft.client.data.models.blockstates.VariantProperties;
+import net.minecraft.client.data.models.model.ModelTemplate;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.registries.DeferredBlock;
 
 import java.util.List;
 import java.util.Set;
@@ -35,32 +38,27 @@ import java.util.concurrent.CompletableFuture;
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class DrippedDatagen {
 	@SubscribeEvent
-	public static void gatherData(GatherDataEvent event) {
+	public static void gatherData(GatherDataEvent.Client event) {
 		DataGenerator generator = event.getGenerator();
 		PackOutput packOutput = generator.getPackOutput();
 		CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-		ExistingFileHelper helper = event.getExistingFileHelper();
 
-		if (event.includeServer()) {
-			generator.addProvider(true, new DripLoots(packOutput, lookupProvider));
-		}
-		if (event.includeClient()) {
-			generator.addProvider(true, new Language(packOutput));
-			generator.addProvider(true, new BlockModels(packOutput, helper));
-			generator.addProvider(true, new BlockStates(packOutput, helper));
-		}
+		generator.addProvider(true, new DripLoots(packOutput, lookupProvider));
+
+		generator.addProvider(true, new Language(packOutput));
+		generator.addProvider(true, new Models(packOutput));
 	}
 
 	private static class DripLoots extends LootTableProvider {
 		public DripLoots(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> completableFuture) {
 			super(packOutput, Set.of(), List.of(
-					new SubProviderEntry(MonsterBlockTables::new, LootContextParamSets.BLOCK)
+					new SubProviderEntry(DrilBlockLoot::new, LootContextParamSets.BLOCK)
 			), completableFuture);
 		}
 
-		public static class MonsterBlockTables extends BlockLootSubProvider {
+		public static class DrilBlockLoot extends BlockLootSubProvider {
 
-			protected MonsterBlockTables(HolderLookup.Provider lookupProvider) {
+			protected DrilBlockLoot(HolderLookup.Provider lookupProvider) {
 				super(Set.of(), FeatureFlags.REGISTRY.allFlags(), lookupProvider);
 			}
 
@@ -92,43 +90,26 @@ public class DrippedDatagen {
 		}
 	}
 
-	private static class BlockStates extends BlockStateProvider {
-		public BlockStates(PackOutput packOutput, ExistingFileHelper helper) {
-			super(packOutput, DrippedOut.MOD_ID, helper);
+	private static class Models extends ModelProvider {
+		private static final ModelTemplate POINTED_DRIPSTONE = ModelTemplates.create("drippedout:sideways_pointed", TextureSlot.CROSS);
+
+		public Models(PackOutput packOutput) {
+			super(packOutput, DrippedOut.MOD_ID);
 		}
 
 		@Override
-		protected void registerStatesAndModels() {
-			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE);
-		}
-
-		private void makeSidewaysDripstone(DeferredBlock<SidewaysDripBlock> block) {
-			ModelFile clusterBlock = models().getExistingFile(modLoc("block/" + block.getId().getPath()));
-			getVariantBuilder(block.get())
-					.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
-					.modelForState().modelFile(clusterBlock).addModel()
-					.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.EAST)
-					.modelForState().modelFile(clusterBlock).rotationY(90).addModel()
-					.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH)
-					.modelForState().modelFile(clusterBlock).rotationY(180).addModel()
-					.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.WEST)
-					.modelForState().modelFile(clusterBlock).rotationY(270).addModel();
-		}
-	}
-
-	private static class BlockModels extends BlockModelProvider {
-		public BlockModels(PackOutput packOutput, ExistingFileHelper helper) {
-			super(packOutput, DrippedOut.MOD_ID, helper);
-		}
-
-		@Override
-		protected void registerModels() {
-			makeSidewaysDripstone(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE);
-		}
-
-		private void makeSidewaysDripstone(DeferredBlock<SidewaysDripBlock> block) {
-			withExistingParent(block.getId().getPath(), modLoc("block/sideways_pointed"))
-					.texture("cross", mcLoc("block/pointed_dripstone_up_tip")).renderType("cutout");
+		protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+			TextureMapping texturemapping = TextureMapping.cross(
+					ResourceLocation.withDefaultNamespace("block/pointed_dripstone_up_tip")
+			);
+			ResourceLocation resourcelocation = POINTED_DRIPSTONE.extend().renderType("cutout").build()
+					.create(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(), texturemapping, blockModels.modelOutput);
+			blockModels.blockStateOutput
+					.accept(MultiVariantGenerator.multiVariant(
+									DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(),
+									Variant.variant().with(VariantProperties.MODEL, resourcelocation))
+							.with(BlockModelGenerators.createHorizontalFacingDispatch())
+					);
 		}
 	}
 }
