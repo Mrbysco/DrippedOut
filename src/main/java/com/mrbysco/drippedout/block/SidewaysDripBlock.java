@@ -32,6 +32,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -46,10 +47,15 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 
 	public SidewaysDripBlock(Properties properties) {
 		super(properties);
-		this.registerDefaultState(this.defaultBlockState().setValue(TIP_DIRECTION, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
+		this.registerDefaultState(this.defaultBlockState()
+				.setValue(TIP_DIRECTION, Direction.NORTH)
+				.setValue(WATERLOGGED, Boolean.FALSE)
+		);
 	}
 
-	public void onProjectileHit(Level level, BlockState state, BlockHitResult hitResult, Projectile projectile) {
+	@Override
+	public void onProjectileHit(@NotNull Level level, @NotNull BlockState state, BlockHitResult hitResult,
+	                            @NotNull Projectile projectile) {
 		BlockPos blockpos = hitResult.getBlockPos();
 		if (level instanceof ServerLevel serverlevel && projectile.mayInteract(serverlevel, blockpos) &&
 				projectile instanceof ThrownTrident && projectile.getDeltaMovement().length() > 0.6D) {
@@ -58,21 +64,24 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier blockEffectApplier) {
-		if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
+	protected void entityInside(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos,
+	                            @NotNull Entity entity, @NotNull InsideBlockEffectApplier blockEffectApplier) {
+		if (level instanceof ServerLevel serverLevel && entity instanceof LivingEntity livingEntity) {
 			if ((livingEntity.xOld != livingEntity.getX() || livingEntity.zOld != livingEntity.getZ())) {
 				double d0 = Math.abs(livingEntity.getX() - livingEntity.xOld);
 				double d1 = Math.abs(livingEntity.getZ() - livingEntity.zOld);
 				if (d0 >= (double) 0.003F || d1 >= (double) 0.003F) {
-					livingEntity.hurt(livingEntity.damageSources().stalagmite(), 1.0F);
+					livingEntity.hurtServer(serverLevel, livingEntity.damageSources().stalagmite(), 1.0F);
 				}
 			}
 		}
 		super.entityInside(state, level, pos, entity, blockEffectApplier);
 	}
 
+	@NotNull
 	@Override
-	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos,
+	                           @NotNull CollisionContext context) {
 		switch (state.getValue(TIP_DIRECTION)) {
 			case EAST -> {
 				return EAST_SHAPE;
@@ -94,7 +103,9 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		BlockPos blockpos = context.getClickedPos();
 		FluidState fluidstate = context.getLevel().getFluidState(blockpos);
-		return this.defaultBlockState().setValue(TIP_DIRECTION, context.getClickedFace()).setValue(WATERLOGGED, Boolean.valueOf(fluidstate.getType() == Fluids.WATER));
+		return this.defaultBlockState()
+				.setValue(TIP_DIRECTION, context.getClickedFace())
+				.setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
 	}
 
 	@Override
@@ -105,30 +116,36 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 		return blockstate.isFaceSturdy(levelReader, blockpos, direction);
 	}
 
+	@NotNull
 	@Override
-	protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess,
-	                                 BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+	protected BlockState updateShape(BlockState state, @NotNull LevelReader level,
+	                                 @NotNull ScheduledTickAccess scheduledTickAccess, @NotNull BlockPos pos,
+	                                 Direction direction, @NotNull BlockPos neighborPos,
+	                                 @NotNull BlockState neighborState, @NotNull RandomSource random) {
 		return direction.getOpposite() == state.getValue(TIP_DIRECTION) && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : state;
 	}
 
+	@NotNull
 	@Override
-	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
+	public ItemStack getCloneItemStack(@NotNull LevelReader level, @NotNull BlockPos pos, @NotNull BlockState state,
+	                                   boolean includeData, @NotNull Player player) {
 		return new ItemStack(Items.POINTED_DRIPSTONE);
 	}
 
-	@SuppressWarnings("deprecation")
+	@NotNull
 	@Override
 	public FluidState getFluidState(BlockState state) {
 		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
-	@SuppressWarnings("deprecation")
+	@NotNull
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
 		return state.setValue(TIP_DIRECTION, rot.rotate(state.getValue(TIP_DIRECTION)));
 	}
 
 	@SuppressWarnings("deprecation")
+	@NotNull
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
 		return state.rotate(mirrorIn.getRotation(state.getValue(TIP_DIRECTION)));

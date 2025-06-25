@@ -17,6 +17,6 @@ A stala-fight.
 [[dependencies.drippedout]]
 modId="minecraft"
 type="REQUIRED"
-versionRange="[1.21.5,1.22)"
+versionRange="[1.21.6,1.22)"
 ordering="NONE"
 side="BOTH"

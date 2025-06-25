@@ -28,12 +28,13 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class DrippedDatagen {
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent.Client event) {
@@ -65,6 +66,7 @@ public class DrippedDatagen {
 				this.dropOther(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(), Items.POINTED_DRIPSTONE);
 			}
 
+			@NotNull
 			@Override
 			protected Iterable<Block> getKnownBlocks() {
 				return (Iterable<Block>) DripRegistry.BLOCKS.getEntries().stream().map((block) -> (Block) block.get())::iterator;
@@ -72,7 +74,9 @@ public class DrippedDatagen {
 		}
 
 		@Override
-		protected void validate(WritableRegistry<LootTable> writableregistry, ValidationContext validationcontext, ProblemReporter.Collector problemreporter$collector) {
+		protected void validate(WritableRegistry<LootTable> writableregistry,
+		                        @NotNull ValidationContext validationcontext,
+		                        ProblemReporter.@NotNull Collector problemreporter$collector) {
 			writableregistry.forEach((lootTable) -> lootTable.validate(validationcontext));
 		}
 	}
@@ -96,7 +100,7 @@ public class DrippedDatagen {
 		}
 
 		@Override
-		protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+		protected void registerModels(BlockModelGenerators blockModels, @NotNull ItemModelGenerators itemModels) {
 			TextureMapping texturemapping = TextureMapping.cross(
 					ResourceLocation.withDefaultNamespace("block/pointed_dripstone_up_tip")
 			);
