@@ -65,7 +65,7 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 
 	@Override
 	protected void entityInside(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos,
-	                            @NotNull Entity entity, @NotNull InsideBlockEffectApplier blockEffectApplier) {
+	                            @NotNull Entity entity, @NotNull InsideBlockEffectApplier applier, boolean intersects) {
 		if (level instanceof ServerLevel serverLevel && entity instanceof LivingEntity livingEntity) {
 			if ((livingEntity.xOld != livingEntity.getX() || livingEntity.zOld != livingEntity.getZ())) {
 				double d0 = Math.abs(livingEntity.getX() - livingEntity.xOld);
@@ -75,7 +75,7 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 				}
 			}
 		}
-		super.entityInside(state, level, pos, entity, blockEffectApplier);
+		super.entityInside(state, level, pos, entity, applier, intersects);
 	}
 
 	@NotNull
