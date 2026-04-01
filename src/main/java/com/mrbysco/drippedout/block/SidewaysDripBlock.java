@@ -5,11 +5,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -154,5 +155,9 @@ public class SidewaysDripBlock extends Block implements SimpleWaterloggedBlock {
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> blockStateBuilder) {
 		blockStateBuilder.add(TIP_DIRECTION, WATERLOGGED);
+	}
+
+	public static boolean never(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
+		return false;
 	}
 }

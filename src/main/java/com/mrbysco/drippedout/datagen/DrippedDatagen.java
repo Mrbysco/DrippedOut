@@ -16,7 +16,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
@@ -102,9 +102,9 @@ public class DrippedDatagen {
 		@Override
 		protected void registerModels(BlockModelGenerators blockModels, @NotNull ItemModelGenerators itemModels) {
 			TextureMapping texturemapping = TextureMapping.cross(
-					ResourceLocation.withDefaultNamespace("block/pointed_dripstone_up_tip")
+					Identifier.withDefaultNamespace("block/pointed_dripstone_up_tip")
 			);
-			ResourceLocation resourcelocation = POINTED_DRIPSTONE.extend().renderType("cutout").build()
+			Identifier resourcelocation = POINTED_DRIPSTONE.extend().renderType("cutout").build()
 					.create(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(), texturemapping, blockModels.modelOutput);
 			blockModels.blockStateOutput
 					.accept(MultiVariantGenerator.dispatch(
