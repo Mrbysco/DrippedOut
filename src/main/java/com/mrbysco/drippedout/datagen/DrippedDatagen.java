@@ -10,19 +10,16 @@ import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -51,13 +48,13 @@ public class DrippedDatagen {
 	private static class DripLoots extends LootTableProvider {
 		public DripLoots(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> completableFuture) {
 			super(packOutput, Set.of(), List.of(
-					new SubProviderEntry(DrilBlockLoot::new, LootContextParamSets.BLOCK)
+					new SubProviderEntry(DripBlockLoot::new, LootContextParamSets.BLOCK)
 			), completableFuture);
 		}
 
-		public static class DrilBlockLoot extends BlockLootSubProvider {
+		public static class DripBlockLoot extends BlockLootSubProvider {
 
-			protected DrilBlockLoot(HolderLookup.Provider lookupProvider) {
+			protected DripBlockLoot(HolderLookup.Provider lookupProvider) {
 				super(Set.of(), FeatureFlags.REGISTRY.allFlags(), lookupProvider);
 			}
 
@@ -73,12 +70,6 @@ public class DrippedDatagen {
 			}
 		}
 
-		@Override
-		protected void validate(WritableRegistry<LootTable> writableregistry,
-		                        @NotNull ValidationContext validationcontext,
-		                        ProblemReporter.@NotNull Collector problemreporter$collector) {
-			writableregistry.forEach((lootTable) -> lootTable.validate(validationcontext));
-		}
 	}
 
 	private static class Language extends LanguageProvider {
@@ -102,14 +93,13 @@ public class DrippedDatagen {
 		@Override
 		protected void registerModels(BlockModelGenerators blockModels, @NotNull ItemModelGenerators itemModels) {
 			TextureMapping texturemapping = TextureMapping.cross(
-					Identifier.withDefaultNamespace("block/pointed_dripstone_up_tip")
+					new Material(Identifier.withDefaultNamespace("block/pointed_dripstone_up_tip"))
 			);
-			Identifier resourcelocation = POINTED_DRIPSTONE.extend().renderType("cutout").build()
-					.create(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(), texturemapping, blockModels.modelOutput);
+			Identifier identifier = POINTED_DRIPSTONE.create(DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(), texturemapping, blockModels.modelOutput);
 			blockModels.blockStateOutput
 					.accept(MultiVariantGenerator.dispatch(
 									DripRegistry.SIDEWAYS_POINTED_DRIPSTONE.get(),
-									BlockModelGenerators.plainVariant(resourcelocation))
+									BlockModelGenerators.plainVariant(identifier))
 							.with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING)
 					);
 		}
